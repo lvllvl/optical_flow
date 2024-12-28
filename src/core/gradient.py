@@ -1,0 +1,1 @@
+# compute gradients with: Sobel, Scharr? anything else?
