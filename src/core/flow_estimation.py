@@ -1,3 +1,4 @@
+from src.core.gradient import compute_gradients
 import numpy as np
 import cv2
 
@@ -16,33 +17,22 @@ def lucas_kanade_flow( frame1: np.ndarray, frame2: np.ndarray, window_size: int=
                            flow[ y, x, 1 ] = vertical flow (v).
 
     """
+    # 1. Convert frames to grayscale + compute Ix, Iy, It
+    Ix, Iy, It = compute_gradients( frame1, frame2 )
 
-    # Ensure frames are grayscale
-    if len( frame1.shape ) == 3:
-        frame1 = cv2.cvtColor( frame1, cv2.COLOR_BGR2GRAY )
+    # Ensure they are fload32, if not already
+    Ix = Ix.astype( np.float32 )
+    Iy = Iy.astype( np.float32 )
+    It = It.astype( np.float32 )
     
-    if len( frame2.shape ) == 3:
-        frame2 = cv2.cvtColor( frame2, cv2.COLOR_BGR2GRAY )
+    # Prepare the flow array
+    h, w = Ix.shape
+    flow = np.zeros(( h, w, 2), dtype=np.float32 )
 
-    # Convert to float32 for better numeric stability
-    frame1 = frame1.astype( np.float32 )
-    frame2 = frame2.astype( np.float32 )
-
-    # Calculate image gradients (Ix, Iy) and temporal gradient ( It )
-        # options: custom gradient filters for more control ( e.g., Sobel, Scharr )
-        # current: Using OpenCV's Sobel for spatial gradients and (frame2-frame1) for temporal gradient.
-    Ix = cv2.Sobel( frame1, cv2.CV_32F, 1, 0, ksize=3 ) # partial derivative wrt x
-    Iy = cv2.Sobel( frame1, cv2.CV_32F, 0, 1, ksize=3 ) # partial derivative wrt y
-    It = frame2 - frame1                                # partial derivative wrt time 
-    
     # Half window size
     half_w = window_size // 2
 
-    # Prepare the flow array
-    h, w = frame1.shape
-    flow = np.zeros(( h, w, 2), dtype=np.float32 )
-
-    # for each pixel, solve for ( u, v )
+    # 2. for each pixel, solve for ( u, v )
     for y in range( half_w, h-half_w ):
         for x in range( half_w, w-half_w ):
 
