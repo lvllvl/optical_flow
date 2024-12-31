@@ -12,8 +12,9 @@ def main( filename ):
     # 1. Load data
     frames = load_frames( filename )
 
-    # 2. Pre-processing: build pyramids
     processed_frames = []
+
+    # 2. Pre-processing: build pyramids for each consecutive pair
     for i in range( len( frames ) - 1 ):
         frame1 = frames[ i ]
         frame2 = frames[ i+1 ]
@@ -22,7 +23,7 @@ def main( filename ):
         pyr1 = build_pyramid( frame1, num_levels=3 )
         pyr2 = build_pyramid( frame2, num_levels=3 )
 
-        # Start from the top (smallest) level
+        # Coarse level flow: Start from the top (smallest) level
         flow_coarse = lucas_kanade_flow( pyr1[ -1 ], pyr2[ -1 ], window_size=7 )
 
         # (Optional) Upsample flow_coarse and refine at lower levels...
@@ -31,8 +32,13 @@ def main( filename ):
 
         # 3. Visualization: overlay flow on original ( frame1 )
         flow_viz = visualize_flow( frame1, flow_fine )
+        
+        # Save to PNG
         out_path = f"outputs/flow_frame_{i}.png"
         save_output( flow_viz, f"output_flow_frame_{i}.png")
+
+        # Add to processed_frames list for final video
+        processed_frames.append( flow_viz )
     
     # Output to a single video
     write_video( processed_frames, "outputs/final_flow_video.mp4", fps=30.0 )
