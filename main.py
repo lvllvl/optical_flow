@@ -1,7 +1,7 @@
 from src.core.gradient import compute_gradients
 from src.core.pyramid import build_pyramid
 from src.core.flow_estimation import lucas_kanade_flow
-from src.utils.io import load_frames, save_output
+from src.utils.io import load_frames, save_output, write_video
 from src.utils.visualization import visualize_flow
 
 import cv2
@@ -13,7 +13,7 @@ def main( filename ):
     frames = load_frames( filename )
 
     # 2. Pre-processing: build pyramids
-    # this is for multi-level approach
+    processed_frames = []
     for i in range( len( frames ) - 1 ):
         frame1 = frames[ i ]
         frame2 = frames[ i+1 ]
@@ -31,7 +31,11 @@ def main( filename ):
 
         # 3. Visualization: overlay flow on original ( frame1 )
         flow_viz = visualize_flow( frame1, flow_fine )
+        out_path = f"outputs/flow_frame_{i}.png"
         save_output( flow_viz, f"output_flow_frame_{i}.png")
+    
+    # Output to a single video
+    write_video( processed_frames, "outputs/final_flow_video.mp4", fps=30.0 )
 
 ####################################
 if __name__ == "__main__":
