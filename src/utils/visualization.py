@@ -2,7 +2,7 @@
 import cv2
 import numpy as np
 
-def visulize_flow( frame: np.ndarray, flow: np.ndarray, mode: str = 'color', step: int = 16 ) -> np.ndarray:
+def visualize_flow( frame: np.ndarray, flow: np.ndarray, mode: str = 'color', step: int = 16 ) -> np.ndarray:
     """
     Visualize optical flow on the given frame.
 
@@ -50,14 +50,14 @@ def color_encode_flow( flow: np.ndarray ) -> np.ndarray:
     # angles already go [ 0..360 ]. We will just clamp to [ 0..179 ] if needed.
     hsv[ ..., 0 ] = np.clip( angle / 2, 0, 179 ).astype( np.uint8 )
     hsv[ ..., 1 ] = 255
-    hsv[ ..., 2 ] = cv2.normalized( magnitude, None, 0, 255, cv2.NORM_MINMAX )
+    hsv[ ..., 2 ] = cv2.normalize( magnitude, None, 0, 255, cv2.NORM_MINMAX )
 
     # Convert HSV to BGR for visualization
     color_flow = cv2.cvtColor( hsv, cv2.COLOR_HSV2BGR )
 
     return color_flow
 
-def drraw_flow_arrows( frame: np.ndarray, flow: np.ndarray, step: int = 16 ) -> np.ndarray:
+def draw_flow_arrows( frame: np.ndarray, flow: np.ndarray, step: int = 16 ) -> np.ndarray:
     """
     Draw arrowed lines to visualize flow vectors on top of the original frame.
 
