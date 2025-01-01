@@ -31,7 +31,7 @@ def main( filename ):
         flow_fine = lucas_kanade_flow( pyr1[ 0 ], pyr2[ 0 ], window_size=7 )
 
         # 3. Visualization: overlay flow on original ( frame1 )
-        flow_viz = visualize_flow( frame1, flow_fine )
+        flow_viz = visualize_flow( frame1, flow_fine, mode='color' ) # OR mode='arrows'
         
         # Save to PNG
         out_path = f"outputs/flow_frame_{i}.png"
